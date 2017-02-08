@@ -1,4 +1,4 @@
-
+PLATFORM = 'linux'
 WEB_DRIVER_WAIT_TIMEOUT = 120  # 2 minutes
 RUT = ''
 CLAVE = ''

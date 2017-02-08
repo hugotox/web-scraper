@@ -4,7 +4,7 @@ from selenium.webdriver import PhantomJS
 from causas_page.page import CausasPage
 from main_page.page import MainPage
 
-driver = PhantomJS(os.path.join(os.getcwd(), 'drivers', 'phantomjs'))
+driver = PhantomJS(os.path.join(os.getcwd(), 'drivers', settings.PLATFORM, 'phantomjs'))
 driver.set_window_size(1200, 775)
 
 main_page = MainPage(driver, rut=settings.RUT, clave=settings.CLAVE)
