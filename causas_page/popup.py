@@ -1,3 +1,4 @@
+import settings
 from core.base_page import BasePage
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -31,4 +32,5 @@ class Popup(BasePage):
                 print(data)
             heading = False
 
-        # driver.close()  # needed when using Chrome
+        if settings.DRIVER == 'chrome':
+            driver.close()  # needed when using Chrome

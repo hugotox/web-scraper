@@ -7,7 +7,6 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 class CausasPage(BasePage):
-
     def __init__(self, driver):
         super().__init__(driver, 'https://oficinajudicialvirtual.pjud.cl/busqueda_por_rut.php')
         self.main_window = None
@@ -16,6 +15,7 @@ class CausasPage(BasePage):
         driver = self.driver
         for form in forms:
             print('Submitting form {}...'.format(locator[1]))
+            # TODO: do not submit forms in "concluida" or "archivada"
             form.submit()
             # wait to make sure there are two windows open
             WebDriverWait(driver, 10).until(lambda d: len(d.window_handles) == 2)
@@ -27,8 +27,6 @@ class CausasPage(BasePage):
             popup.check_data()
             driver.switch_to.window(self.main_window)
 
-            # TODO: go to next page until there is no "Siguiente" link
-
     def init_scraping(self):
         driver = self.driver
         self.main_window = driver.current_window_handle
@@ -36,8 +34,26 @@ class CausasPage(BasePage):
         # tab content is loaded using ajax so we need to wait for it...
         for locator in CausasPageLocators.FORMS_XPATHS:
             WebDriverWait(driver, settings.WEB_DRIVER_WAIT_TIMEOUT).until(
-                EC.presence_of_element_located(locator)
+                EC.presence_of_element_located(locator['form'])  # takes a tuple as argument so no need for *
             )
 
-            forms = driver.find_elements(*locator)
-            self.loop_forms(forms, locator)
+            # click on the tab
+            driver.find_element(*locator['tab']).click()
+
+            next_link = True
+            while next_link:
+                try:
+                    forms = driver.find_elements(*locator['form'])
+                    self.loop_forms(forms, locator['form'])
+                except:
+                    pass
+
+                try:
+                    # FIXME: I have to click the tab so the next_link.click() works
+                    next_link = driver.find_element(*locator['next_link'])
+                    next_link.click()
+                    WebDriverWait(driver, settings.WEB_DRIVER_WAIT_TIMEOUT).until(
+                        EC.presence_of_element_located(locator['form'])  # takes a tuple as argument so no need for *
+                    )
+                except:
+                    next_link = None
