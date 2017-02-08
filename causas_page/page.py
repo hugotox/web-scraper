@@ -11,21 +11,27 @@ class CausasPage(BasePage):
         super().__init__(driver, 'https://oficinajudicialvirtual.pjud.cl/busqueda_por_rut.php')
         self.main_window = None
 
+    def is_archived(self, form, locator):
+        # TODO: implement me
+        driver = self.driver
+        tr = form.find_element_by_xpath('parent::td/parent::tr')
+        return True
+
     def loop_forms(self, forms, locator):
         driver = self.driver
         for form in forms:
-            print('Submitting form {}...'.format(locator[1]))
-            # TODO: do not submit forms in "concluida" or "archivada"
-            form.submit()
-            # wait to make sure there are two windows open
-            WebDriverWait(driver, 10).until(lambda d: len(d.window_handles) == 2)
+            if not self.is_archived(form, locator):
+                print('Submitting form {}...'.format(locator[1]))
+                form.submit()
+                # wait to make sure there are two windows open
+                WebDriverWait(driver, 10).until(lambda d: len(d.window_handles) == 2)
 
-            # switch windows
-            driver.switch_to.window('popup')
+                # switch windows
+                driver.switch_to.window('popup')
 
-            popup = Popup(self.driver)
-            popup.check_data()
-            driver.switch_to.window(self.main_window)
+                popup = Popup(self.driver)
+                popup.check_data()
+                driver.switch_to.window(self.main_window)
 
     def init_scraping(self):
         driver = self.driver
