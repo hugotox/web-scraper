@@ -25,6 +25,8 @@ class Popup(BasePage):
         # first row is heading
         heading = True
         rows = table.find_elements_by_tag_name('tr')
+
+        # TODO: save to database
         for row in rows:
             if not heading:
                 cols = row.find_elements_by_tag_name('td')

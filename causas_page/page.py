@@ -12,10 +12,37 @@ class CausasPage(BasePage):
         self.main_window = None
 
     def is_archived(self, form, locator):
-        # TODO: implement me
-        driver = self.driver
-        tr = form.find_element_by_xpath('parent::td/parent::tr')
-        return True
+        """
+        Locator is the `form` object found in locators.FORMS_XPATH
+        E.g. (By.XPATH, "//form[@action='./causas/causa_suprema2.php']")
+        """
+        status_list = ['concluida', 'concluída', 'concluidas', 'concluídas', 'archivada', 'archivadas']
+
+        try:
+            tr = form.find_element_by_xpath('parent::td/parent::tr')
+            # based on the locator I know which tab I'm working on the locator
+            if locator[1] == CausasPageLocators.FORM_SUPREMA:
+                tab_idx = 4
+            elif locator[1] == CausasPageLocators.FORM_APELACIONES:
+                tab_idx = 5
+            elif locator[1] == CausasPageLocators.FORM_CIVIL:
+                tab_idx = 5
+            elif locator[1] == CausasPageLocators.FORM_LABORAL:
+                tab_idx = 5
+            elif locator[1] == CausasPageLocators.FORM_PENAL:
+                tab_idx = 6
+            elif locator[1] == CausasPageLocators.FORM_COBRANZA:
+                tab_idx = 0  # TODO save this on a DB because there is no `Estado causa` column
+            elif locator[1] == CausasPageLocators.FORM_FAMILIA:
+                tab_idx = 5
+            else:
+                return False
+            estado = tr.find_elements_by_tag_name('td')[tab_idx]
+            return estado.text.lower() in status_list
+        except:
+            pass
+
+        return False
 
     def loop_forms(self, forms, locator):
         driver = self.driver
@@ -55,7 +82,6 @@ class CausasPage(BasePage):
                     pass
 
                 try:
-                    # FIXME: I have to click the tab so the next_link.click() works
                     next_link = driver.find_element(*locator['next_link'])
                     next_link.click()
                     WebDriverWait(driver, settings.WEB_DRIVER_WAIT_TIMEOUT).until(
